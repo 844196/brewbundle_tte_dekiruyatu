@@ -8,6 +8,11 @@
 
 `$ brew bundle brewfile`ってできるやつです。
 
+## Installation
+```shellsession
+$ brew install 844196/renge/brewbundle-tte-dekiruyatu
+```
+
 ## Usage
 
 - brewfileを指定して実行
