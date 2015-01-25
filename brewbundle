@@ -1,22 +1,57 @@
 #!/bin/bash
 #
-#   Usage:
-#       brewbundle.sh [file]
+#   @(#) brew bundle tte dekiruyatu
 #
 #   Author:
-#       @84____ (Masaya Tk.)
+#       844196 (Masaya Tk)
+#
+#   License:
+#       MIT
 #
 
-base=${0##*/}
-_error() {
-    echo "${base%.sh}: invaild argument" 1>&2
-    exit 1
+
+# initialize
+## set option
+set -u
+
+## about me
+readonly ME="${0##*/}"
+readonly VERSION="0.1"
+
+## error
+function error() {
+    echo "${ME}: ${*}" 1>&2
 }
 
-if [ -z "${1}" ]; then _error; fi
 
-while read line; do
-    if $(echo ${line} | grep -qv -e '^$' -e '^#'); then
-        brew ${line}
+# main
+## read brewfile
+if [[ -z "${1:-}" ]]; then
+    if [[ -e "./brewfile" ]]; then
+        # if exisite "./brewfile", $brewfile='./brewfile'
+        readonly brewfile="./brewfile"
+    else
+        # no brewfile -> exit 1
+        error "No brewfile"
+        exit 1
     fi
-done < ${1}
+else
+    # if execute "brew bundle FOOBAR", $brewfile='./FOOBAR'
+    readonly brewfile="${1}"
+fi
+
+## execute command
+function brewExecute(){
+    brew "${@}"
+    return "${?}"
+}
+
+while read line
+do
+    # ignore comment
+    if echo "${line}" | grep -qv -e '^$' -e '^#'; then
+        command="$(echo "${line}" | sed -e 's/#.*$//g')"
+        # shellcheck disable=SC2086
+        brewExecute ${command}
+    fi
+done <"${brewfile:-}"
